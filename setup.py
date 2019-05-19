@@ -14,7 +14,7 @@ setup(
     version='0.5',
     license='MIT',
     # We will also need a readme eventually (there will be a warning)
-    long_description=open('README.rst').read(),
+#     long_description=open('README.rst').read(),
     # if there are any scripts
     scripts=['scripts/test.py'],
 )
