@@ -3,9 +3,9 @@ from setuptools import setup
 setup(
     # Needed to silence warnings
     name='Measurements',
-    url='https://github.com/jladan/package_demo',
-    author='John Ladan',
-    author_email='jladan@uwaterloo.ca',
+    url='https://github.com/pvn25/SortingHatLib',
+    author='Vraj Shah',
+    author_email='pvn251@gmail.cin',
     # Needed to actually package something
     packages=['measure'],
     # Needed for dependencies
