@@ -15,7 +15,7 @@ setup(
     license='MIT',
     description='An example of a python package from pre-existing code',
     # We will also need a readme eventually (there will be a warning)
-    long_description=open('README.rst').read(),
+#     long_description=open('README.rst').read(),
     # if there are any scripts
     scripts=['scripts/hello.py'],
 )
