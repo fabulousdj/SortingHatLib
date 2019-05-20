@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     # Needed to silence warnings
-    name='Measurements',
-    url='https://github.com/pvn25/ML-Data-Prep-Zoo/tree/master/ML%20Schema%20Inference',
+    name='ML Feature Type Inference',
+    url='https://github.com/pvn25/SortingHatLib',
     author='Vraj Shah',
     author_email='vps002@eng.ucsd.edu',
     # Needed to actually package something
