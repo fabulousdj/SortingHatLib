@@ -5,9 +5,9 @@ setup(
     name='Measurements',
     url='https://github.com/pvn25/SortingHatLib',
     author='Vraj Shah',
-    author_email='pvn251@gmail.cin',
+    author_email='pvn251@gmail.com',
     # Needed to actually package something
-    packages=['measure'],
+    packages=['sortinghat'],
     # Needed for dependencies
     install_requires=['numpy'],
     # *strongly* suggested for sharing
