@@ -7,5 +7,5 @@ How to use the package?
 
 git clone https://github.com/pvn25/SortingHatLib.git
 
-pip install SortingHatLib
+pip install SortingHatLib/
 ```
