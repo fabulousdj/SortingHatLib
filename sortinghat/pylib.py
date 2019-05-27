@@ -19,7 +19,8 @@ import enchant
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.feature_extraction.text import CountVectorizer
 from tabulate import tabulate 
-
+from keras.preprocessing import text as keras_text, sequence as keras_seq
+from keras.models import load_model
 
 # In[33]:
 
@@ -265,6 +266,7 @@ def attr_bagofwords(name_ke):
 # Total_val, nans, dist_val, mean, std_dev, min_val, max_val
 csv_names = ['Attribute_name','Total_val', 'Num of nans', 'num of dist_val', 'mean', 'std_dev', 'min_val', 'max_val','castability','extractability', 'len_val','sample_1', 'sample_2', 'sample_3','sample_4','sample_5']
 golden_data = pd.DataFrame(columns = csv_names)
+final_data = pd.DataFrame(columns = csv_names)
 keys = []
 
 def BaseFeaturization(CsvFile):
@@ -301,7 +303,7 @@ def BaseFeaturization(CsvFile):
     value_length.extend(val_length(df, keys))
     print(value_length)
     
-    global golden_data
+    global golden_data, final_data
     print('---')
     val_append = []
     for i in range(len(stats)):
@@ -336,33 +338,109 @@ def BaseFeaturization(CsvFile):
     golden_data['Num_of_nans'] = [golden_data['Num_of_nans'][i]*100/golden_data['Total_val'][i] for i in golden_data.index]
     golden_data['num_of_dist_val'] = [golden_data['num_of_dist_val'][i]*100/golden_data['Total_val'][i] for i in golden_data.index]    
     
-    data1 = golden_data[['Num_of_nans', 'max_val', 'mean', 'min_val', 'num_of_dist_val','std_dev','castability','extractability', 'len_val']]
-    data1 = data1.fillna(0)
-#     data1 = data1.rename(columns={'mean': 'scaled_mean', 'min_val': 'scaled_min_val', 'max_val': 'scaled_max_val','std_dev': 'scaled_std_dev'})
 
-#     column_names_to_normalize = ['scaled_max_val', 'scaled_mean', 'scaled_min_val','scaled_std_dev']
-#     # column_names_to_normalize = ['scaled_mean','scaled_std_dev', 'scaled_len_val']
-#     x = data1[column_names_to_normalize].values
-#     x = np.nan_to_num(x)
-#     x_scaled = StandardScaler().fit_transform(x)    
+    if rf:
+        data1 = golden_data[['Num_of_nans', 'max_val', 'mean', 'min_val', 'num_of_dist_val','std_dev','castability','extractability', 'len_val']]
+        data1 = data1.fillna(0)
+    #     data1 = data1.rename(columns={'mean': 'scaled_mean', 'min_val': 'scaled_min_val', 'max_val': 'scaled_max_val','std_dev': 'scaled_std_dev'})
+
+    #     column_names_to_normalize = ['scaled_max_val', 'scaled_mean', 'scaled_min_val','scaled_std_dev']
+    #     # column_names_to_normalize = ['scaled_mean','scaled_std_dev', 'scaled_len_val']
+    #     x = data1[column_names_to_normalize].values
+    #     x = np.nan_to_num(x)
+    #     x_scaled = StandardScaler().fit_transform(x)    
+        
+        
+    #     df_temp = pd.DataFrame(x_scaled, columns=column_names_to_normalize, index = data1.index)
+    #     data1[column_names_to_normalize] = df_temp
+        data1.Num_of_nans = data1.Num_of_nans.astype(float)
+        data1.num_of_dist_val = data1.num_of_dist_val.astype(float)
+        data1.castability = data1.castability.astype(float)
+        data1.extractability = data1.extractability.astype(float)
+        
+        d = enchant.Dict("en_US")
+        for i in golden_data.index:
+            ival = golden_data.at[i,'Attribute_name']
+            if ival != 'id' and d.check(ival):
+                data1.at[i,'dictionary_item'] = 1
+            else:
+                data1.at[i,'dictionary_item'] = 0
+
+        final_data = data1
     
-    
-#     df_temp = pd.DataFrame(x_scaled, columns=column_names_to_normalize, index = data1.index)
-#     data1[column_names_to_normalize] = df_temp
-    data1.Num_of_nans = data1.Num_of_nans.astype(float)
-    data1.num_of_dist_val = data1.num_of_dist_val.astype(float)
-    data1.castability = data1.castability.astype(float)
-    data1.extractability = data1.extractability.astype(float)
-    
-    d = enchant.Dict("en_US")
-    for i in golden_data.index:
-        ival = golden_data.at[i,'Attribute_name']
-        if ival != 'id' and d.check(ival):
-            data1.at[i,'dictionary_item'] = 1
-        else:
-            data1.at[i,'dictionary_item'] = 0    
-    
-    return data1
+    if cnn:
+#         data1 = data1.rename(columns={'mean': 'scaled_mean', 'min_val': 'scaled_min_val', 'max_val': 'scaled_max_val','std_dev': 'scaled_std_dev'})
+#         column_names_to_normalize = ['scaled_max_val', 'scaled_mean', 'scaled_min_val','scaled_std_dev']
+        column_names_to_normalize = ['max_val', 'mean', 'min_val','std_dev','num_of_dist_val','Num_of_nans','Total_val']        
+        x = golden_data[column_names_to_normalize].values
+        x = np.nan_to_num(x)
+        x_scaled = StandardScaler().fit_transform(x)
+        df_temp = pd.DataFrame(x_scaled, columns=column_names_to_normalize, index = golden_data.index)
+        golden_data[column_names_to_normalize] = df_temp
+
+        data1 = golden_data[['Num_of_nans', 'max_val', 'mean', 'min_val', 'num_of_dist_val','std_dev','castability','extractability', 'len_val','Total_val']]
+        arr = golden_data['Attribute_name'].values
+#         print(arr)
+        arr1 = golden_data['sample_1'].values
+        print(arr1)
+        arr1_1 = []
+        for x in arr1:
+            try:
+                arr1_1.append(str(x))
+            except UnicodeEncodeError:
+                arr1_1.append(str(x.encode('utf-8')))
+        arr1 = arr1_1
+        
+        arr2 = golden_data['sample_2'].values
+        print(arr2)
+        arr2_1 = []
+        for x in arr2:
+            try:
+                arr2_1.append(str(x))
+            except UnicodeEncodeError:
+                arr2_1.append(str(x.encode('utf-8')))
+        arr2 = arr2_1        
+        
+#         arr1 = [str(x) for x in arr1]
+#         try:
+#             arr1 = [str(x) for x in arr1]
+#         except UnicodeEncodeError:
+#             arr1 = [str(x.encode('utf-8')) for x in arr1]
+#         print(arr1)
+#         arr2 = golden_data['sample_2'].values
+#         arr2 = [str(x) for x in arr2]
+#         print(arr2)
+#         vectorizer = CountVectorizer(ngram_range=(2,2),analyzer='char')
+        
+        vectorizer1 = pickle.load(open("vectorcnn1.pickel", "rb"), encoding="latin1")
+        X = vectorizer1.transform(arr)
+#         print(len(vectorizer1.get_feature_names()))        
+        
+        vectorizer2 = pickle.load(open("vectorcnn2.pickel", "rb"), encoding="latin1")
+        X1 = vectorizer2.transform(arr1)
+#         print(len(vectorizer2.get_feature_names()))        
+        
+        vectorizer3 = pickle.load(open("vectorcnn3.pickel", "rb"), encoding="latin1")
+        X2 = vectorizer3.transform(arr2)
+#         print(len(vectorizer3.get_feature_names()))        
+
+        # print(X.toarray())
+
+        # data1.to_csv('before.csv')
+#         print(vectorizer.get_feature_names())
+        tempdf = pd.DataFrame(X.toarray())
+        tempdf1 = pd.DataFrame(X1.toarray())
+        tempdf2 = pd.DataFrame(X2.toarray())
+        data2 = pd.concat([data1,tempdf,tempdf1,tempdf2], axis=1, sort=False)   
+        data2 = data2.rename(columns={'mean': 'scaled_mean', 'min_val': 'scaled_min_val', 'max_val': 'scaled_max_val','std_dev': 'scaled_std_dev'})
+            
+        print(data1.shape)
+        print(data2.shape)            
+
+        final_data = data2
+
+
+    return final_data
 
 
 # In[72]:
@@ -416,28 +494,54 @@ def Featurize(data1, signal1,signal2='',signal3='',n=3):
 # In[75]:
 
 str2return = ''
+cnn,rf,knn = 0,0,0
 def Initialize(curstr):
-    global str2return
+    global str2return,cnn,rf,knn
     if curstr == 'rf':
         str2return = 'rfmodel.sav'
+        rf = 1
     elif curstr == 'neural':
-        str2return = 'neuralmodel.sav'
+        str2return = 'neuralmodel.h5'
+        cnn = 1
     elif curstr == 'knn':
         str2return = 'knnmodel.sav'
+        knn = 1
 
 def LoadModel(data2):
+    global final_data
     filename = str2return
-    loaded_model = pickle.load(open(filename, 'rb'),encoding='latin1')
-    y_prob = loaded_model.predict_proba(data2)
-    print(y_prob)
 
-    predictions = np.argmax(y_prob, axis=1)
-    confidences = np.max(y_prob, axis=1)
-    print(predictions)
-    print(keys)
+    if rf:
+        loaded_model = pickle.load(open(filename, 'rb'),encoding='latin1')
+        y_prob = loaded_model.predict_proba(data2)
+        print(y_prob)
+
+        predictions = np.argmax(y_prob, axis=1)
+        confidences = np.max(y_prob, axis=1)
+        print(predictions)
+        print(keys)
+    
+    if cnn:
+        list_sentences_train = keys
+        tokenizer = keras_text.Tokenizer(char_level = True)
+        tokenizer.fit_on_texts(list(list_sentences_train))
+        list_tokenized_train = tokenizer.texts_to_sequences(list_sentences_train)
+        X_t = keras_seq.pad_sequences(list_tokenized_train, maxlen=512)   
+
+        final_data = final_data.values
+        bestone = load_model('neuralmodel.h5')
+        y_prob = bestone.predict([X_t,final_data])
+        print(y_prob)
+
+        y_pred = [np.argmax(i) for i in y_prob]
+        print(y_pred)
+
+        predictions = np.argmax(y_prob, axis=1)
+        confidences = np.max(y_prob, axis=1)
+        print(predictions)
+        print(keys)
 
     dict_label_inv = {0:'Numeric', 1:'Needs-Extraction', 2:'Categorical', 3:'Not-Generalizable', 4:'Context-Specific'}
-
     matrix = []
     i=0
     for x in predictions:
@@ -447,9 +551,8 @@ def LoadModel(data2):
         templst.append(confidences[i])
         matrix.append(templst)
         i=i+1 
-        
-    headers = ['Column', 'Inferred Feature Type', 'Confidence Score']
 
+    headers = ['Column', 'Inferred Feature Type', 'Confidence Score']
     print(tabulate(matrix,headers))
 
 # In[ ]:
