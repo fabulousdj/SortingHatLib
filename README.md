@@ -1,7 +1,7 @@
 # SortingHatLib
 
 
-1. How to use the package?
+1. Install the package using python-pip
 
 ```bash
 
