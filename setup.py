@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     # Needed to silence warnings
-    name='Measurements',
+    name='SortingHat Library',
     url='https://github.com/pvn25/SortingHatLib',
     author='Vraj Shah',
     author_email='pvn251@gmail.com',

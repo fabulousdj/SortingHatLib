@@ -25,26 +25,26 @@ from tabulate import tabulate
 
 
 #read csv
-dict_label = {'Usable directly numeric':0, 'Usable with extraction':1, 'Usable with Extration': 1, 'Usable with extraction ':1, 'Usable directly categorical':2, 'Unusable':3, 'Context_specific':4, 'Usable directly categorical ':2}
-data = pd.read_csv('data_for_ML_num.csv')
+# dict_label = {'Usable directly numeric':0, 'Usable with extraction':1, 'Usable with Extration': 1, 'Usable with extraction ':1, 'Usable directly categorical':2, 'Unusable':3, 'Context_specific':4, 'Usable directly categorical ':2}
+# data = pd.read_csv('data_for_ML_num.csv')
 
-data['y_act'] = [dict_label[i] for i in data['y_act']]
-y = data.loc[:,['y_act']]
+# data['y_act'] = [dict_label[i] for i in data['y_act']]
+# y = data.loc[:,['y_act']]
 
 
 # In[34]:
 
 
-data['Num of nans'] = [data['Num of nans'][i]*100/data['Total_val'][i] for i in data.index]
-data['num of dist_val'] = [data['num of dist_val'][i]*100/data['Total_val'][i] for i in data.index]
+# data['Num of nans'] = [data['Num of nans'][i]*100/data['Total_val'][i] for i in data.index]
+# data['num of dist_val'] = [data['num of dist_val'][i]*100/data['Total_val'][i] for i in data.index]
 
-data1 = data[['Num of nans', 'max_val', 'mean', 'min_val', 'num of dist_val','std_dev','castability','extractability', 'len_val']]
-data1 = data1.fillna(0)
+# data1 = data[['Num of nans', 'max_val', 'mean', 'min_val', 'num of dist_val','std_dev','castability','extractability', 'len_val']]
+# data1 = data1.fillna(0)
 
-arr = data['Attribute_name'].values
-vectorizer = CountVectorizer(ngram_range=(3,3),analyzer='char')
-X = vectorizer.fit_transform(arr)
-pickle.dump(vectorizer, open("vector.pickel", "wb"))
+# arr = data['Attribute_name'].values
+# vectorizer = CountVectorizer(ngram_range=(3,3),analyzer='char')
+# X = vectorizer.fit_transform(arr)
+# pickle.dump(vectorizer, open("vector.pickel", "wb"))
 
 
 # In[35]:
@@ -346,11 +346,9 @@ def BaseFeaturization(CsvFile):
     data1.extractability = data1.extractability.astype(float)
     
     d = enchant.Dict("en_US")
-    for i in data.index:
-        ival = data.at[i,'Attribute_name']
+    for i in golden_data.index:
+        ival = golden_data.at[i,'Attribute_name']
         if ival != 'id' and d.check(ival):
-    #         print >> f,ival
-    #         print >> f,y.at[i,'y_act']
             data1.at[i,'dictionary_item'] = 1
         else:
             data1.at[i,'dictionary_item'] = 0    
@@ -394,30 +392,35 @@ def Featurize(data1, signal1,signal2,signal3,n):
 # In[73]:
 
 
-data1 = BaseFeaturization('insurance.csv')
-data2 = Featurize(data1, 'Attribute_name','','',3)
+# data1 = BaseFeaturization('insurance.csv')
+# data2 = Featurize(data1, 'Attribute_name','','',3)
 
 
-# In[74]:
+# # In[74]:
 
 
-data2.dropna(inplace=True)
-print(data2)
+# data2.dropna(inplace=True)
+# print(data2)
 
 
 # In[75]:
 
+str2return = ''
+def Initialize(curstr):
+    global str2return
+    if curstr == 'rf':
+        str2return = 'rfmodel.sav'
+    elif curstr == 'neural':
+        str2return = 'neuralmodel.sav'
+    elif curstr == 'knn':
+        str2return = 'knnmodel.sav'
 
 def LoadModel(data2):
-    filename = 'finalized_model.sav'
+    filename = str2return
     loaded_model = pickle.load(open(filename, 'rb'),encoding='latin1')
     y_prob = loaded_model.predict_proba(data2)
     print(y_prob)
-
-
-    # In[76]:
-
-
+    
     predictions = np.argmax(y_prob, axis=1)
     confidences = np.max(y_prob, axis=1)
     print(predictions)
