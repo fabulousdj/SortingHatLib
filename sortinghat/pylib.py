@@ -412,15 +412,15 @@ def BaseFeaturization(CsvFile):
 #         print(arr2)
 #         vectorizer = CountVectorizer(ngram_range=(2,2),analyzer='char')
         
-        vectorizer1 = pickle.load(open("vectorcnn1.pickel", "rb"), encoding="latin1")
+        vectorizer1 = pickle.load(open("/SortingHatLib/models/vectorcnn1.pickel", "rb"), encoding="latin1")
         X = vectorizer1.transform(arr)
 #         print(len(vectorizer1.get_feature_names()))        
         
-        vectorizer2 = pickle.load(open("vectorcnn2.pickel", "rb"), encoding="latin1")
+        vectorizer2 = pickle.load(open("/SortingHatLib/models/vectorcnn2.pickel", "rb"), encoding="latin1")
         X1 = vectorizer2.transform(arr1)
 #         print(len(vectorizer2.get_feature_names()))        
         
-        vectorizer3 = pickle.load(open("vectorcnn3.pickel", "rb"), encoding="latin1")
+        vectorizer3 = pickle.load(open("/SortingHatLib/models/vectorcnn3.pickel", "rb"), encoding="latin1")
         X2 = vectorizer3.transform(arr2)
 #         print(len(vectorizer3.get_feature_names()))        
 
@@ -446,9 +446,9 @@ def BaseFeaturization(CsvFile):
 # In[72]:
 
 
-def Featurize(data1, signal1,signal2='',signal3='',n=3):
+def Featurize(data1, signal1 = 'Attribute_name',signal2='',signal3='',n=3):
 #     vectorizer = CountVectorizer(ngram_range=(n,n),analyzer='char')
-    vectorizer = pickle.load(open("vector.pickel", "rb"))
+    vectorizer = pickle.load(open("/SortingHatLib/models/vector.pickel", "rb"))
     data2 = pd.DataFrame() 
     
     global golden_data
@@ -498,13 +498,13 @@ cnn,rf,knn = 0,0,0
 def Initialize(curstr):
     global str2return,cnn,rf,knn
     if curstr == 'rf':
-        str2return = 'rfmodel.sav'
+        str2return = '/SortingHatLib/models/rfmodel.sav'
         rf = 1
     elif curstr == 'neural':
-        str2return = 'neuralmodel.h5'
+        str2return = '/SortingHatLib/models/neuralmodel.h5'
         cnn = 1
     elif curstr == 'knn':
-        str2return = 'knnmodel.sav'
+        str2return = '/SortingHatLib/models/knnmodel.sav'
         knn = 1
 
 def LoadModel(data2):
@@ -529,7 +529,7 @@ def LoadModel(data2):
         X_t = keras_seq.pad_sequences(list_tokenized_train, maxlen=512)   
 
         final_data = final_data.values
-        bestone = load_model('neuralmodel.h5')
+        bestone = load_model('/SortingHatLib/models/neuralmodel.h5')
         y_prob = bestone.predict([X_t,final_data])
         print(y_prob)
 
