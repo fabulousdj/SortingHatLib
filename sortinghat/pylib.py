@@ -163,7 +163,10 @@ def val_length(dat,column_names):
             i += 1
             if i > len(dat[keys]) - 2:
                 break
-        val.append(len(str(dat[keys][i]).split()))
+        try:
+            val.append(len(str(dat[keys][i]).split()))
+        except UnicodeEncodeError:    
+            val.append(len(str(dat[keys][i].encode('utf-8')).split()))
     return val      
 
 
@@ -185,14 +188,20 @@ def get_castability(dat):
     #make sure the value you are avaluating is not nan
     castability = 0
     for values in sample_values:
-        if pd.isnull(values) == False and values.__class__.__name__ == 'str':
+        print(values.__class__.__name__)
+        if pd.isnull(values) == False and (values.__class__.__name__ == 'str' or values.__class__.__name__ == 'unicode'):
             try:
                 castability = str(type(eval(values)))
                 castability = 1
                 break
             except:
+                dew = 1
                 #print('passing')
-                pass
+#                 pass
+        if pd.isnull(values) == False and (values.__class__.__name__ == 'int' or values.__class__.__name__ == 'float'):
+            castability = 1
+            break
+            
     return castability  
 
 def get_extractability(dat, cast):
@@ -314,11 +323,11 @@ def BaseFeaturization(CsvFile):
     castability, extractability, len_val = [], [], []
     for i in range(len(golden_data)):
         castability.append(get_castability(golden_data.loc[i]))
-        extractability.append(get_extractability(golden_data.loc[i], castability[i]))
-        len_val.append(get_len(golden_data.loc[i]))
+        # extractability.append(get_extractability(golden_data.loc[i], castability[i]))
+        # len_val.append(get_len(golden_data.loc[i]))
     golden_data['castability'] = castability
-    golden_data['extractability'] = extractability
-    golden_data['len_val'] = len_val          
+    # golden_data['extractability'] = extractability
+    # golden_data['len_val'] = len_val          
 
     golden_data = golden_data.rename(columns={'Num of nans': 'Num_of_nans', 'num of dist_val': 'num_of_dist_val'})
 #     golden_data['Num_of_nans'] = [float(golden_data['Num_of_nans'][i])/float(golden_data['Total_val'][i]) for i in golden_data.index]
@@ -359,7 +368,7 @@ def BaseFeaturization(CsvFile):
 # In[72]:
 
 
-def Featurize(data1, signal1,signal2,signal3,n):
+def Featurize(data1, signal1,signal2='',signal3='',n=3):
 #     vectorizer = CountVectorizer(ngram_range=(n,n),analyzer='char')
     vectorizer = pickle.load(open("vector.pickel", "rb"))
     data2 = pd.DataFrame() 
@@ -386,6 +395,7 @@ def Featurize(data1, signal1,signal2,signal3,n):
         tempdf3 = pd.DataFrame(X3.toarray())
         data2 = pd.concat([data2,tempdf3], axis=1, sort=False)
     
+    data2.dropna(inplace=True)
     return data2
 
 
@@ -420,7 +430,7 @@ def LoadModel(data2):
     loaded_model = pickle.load(open(filename, 'rb'),encoding='latin1')
     y_prob = loaded_model.predict_proba(data2)
     print(y_prob)
-    
+
     predictions = np.argmax(y_prob, axis=1)
     confidences = np.max(y_prob, axis=1)
     print(predictions)
