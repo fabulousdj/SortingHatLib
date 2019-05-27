@@ -18,10 +18,10 @@ import sortinghat.pylib as pl
 ```
 3. Choose from the available models:
 
-rf: Random Forest
-neural: Neural Model
 
 ```bash
+# rf: Random Forest
+# neural: Neural Model
 pl.Initialize('rf')
 
 ```
