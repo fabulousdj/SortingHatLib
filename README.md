@@ -4,5 +4,8 @@
 How to use the package?
 
 ```bash
-pip install git+https://github.com/pvn25/SortingHatLib.git
+
+git clone https://github.com/pvn25/SortingHatLib.git
+
+pip install SortingHatLib
 ```
