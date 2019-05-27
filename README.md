@@ -13,7 +13,7 @@ pip install SortingHatLib/
 
 ```bash
 
-pl.Initialize('rf')
+import sortinghat.pylib as pl
 
 ```
 3. Choose from the available models:
@@ -21,7 +21,12 @@ pl.Initialize('rf')
 rf: Random Forest
 neural: Neural Model
 
-Perform base featurization of the raw CSV file:
+```bash
+pl.Initialize('rf')
+
+```
+
+4. Perform base featurization of the raw CSV file:
 
 ```bash
 
@@ -29,7 +34,7 @@ data1 = pl.BaseFeaturization('rawcsvfile.csv')
 
 ```
 
-4. More featurization (n-gram feature extraction) for Classical ML models:
+5. More featurization (n-gram feature extraction) for Classical ML models:
 
 ```bash
 
@@ -37,7 +42,7 @@ data2 = pl.Featurize(data1)
 
 ```
 
-5. Finally, load the model for prediction
+6. Finally, load the model for prediction
 
 ```bash
 
