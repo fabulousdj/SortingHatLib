@@ -50,3 +50,16 @@ pl.LoadModel(data2)
 
 ```
 
+The output is given as confidence scores:
+
+Column    Inferred Feature Type      Confidence Score
+--------  -----------------------  ------------------
+age       Numeric                            0.870804
+sex       Categorical                        0.768513
+bmi       Numeric                            0.640905
+children  Categorical                        0.422998
+smoker    Categorical                        0.783468
+region    Categorical                        0.864832
+charges   Not-Generalizable                  0.485356
+
+
