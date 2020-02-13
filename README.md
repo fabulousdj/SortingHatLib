@@ -1,6 +1,6 @@
 # SortingHatLib
 
-Library for ML feature type inference: https://github.com/pvn25/ML-Data-Prep-Zoo/tree/master/ML%20Schema%20Inference
+Library for ML feature type inference: https://github.com/pvn25/ML-Data-Prep-Zoo/tree/master/ML%20Feature%20Type%20Inference
 
 
 1. Install the package using python-pip
