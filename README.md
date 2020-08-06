@@ -18,12 +18,12 @@ pip install SortingHatLib/
 import sortinghat.pylib as pl
 
 ```
-3. Choose from the available models:
+3. Read in csv file using pandas
 
 
 ```bash
 # rf: Random Forest, neural: Neural Model, knn: K-nn, logreg: Logistic Regression, svm: RBF_SVM
-pl.Initialize('rf')
+dataDownstream = pd.read_csv('adult.csv')
 
 ```
 
@@ -31,15 +31,15 @@ pl.Initialize('rf')
 
 ```bash
 
-data1 = pl.BaseFeaturization('rawcsvfile.csv')
+dataFeaturized = pl.FeaturizeFile(dataDownstream)
 
 ```
 
-5. More featurization (n-gram feature extraction) for Classical ML models:
+5. bigram feature extraction for Random Forest:
 
 ```bash
 
-data2 = pl.Featurize(data1)
+dataFeaturized1 = pl.FeatureExtraction(dataFeaturized)
 
 ```
 
@@ -47,20 +47,9 @@ data2 = pl.Featurize(data1)
 
 ```bash
 
-pl.LoadModel(data2)
+y_RF = pl.Load_RF(dataFeaturized1)
 
 ```
 
-The output is given as confidence scores:
-
-| Column   | Inferred Feature Type | Confidence Score |
-|----------|-----------------------|------------------|
-| age      | Numeric               | 0.870804         |
-| gender   | Categorical           | 0.768513         |
-| bmi      | Numeric               | 0.640905         |
-| children | Categorical           | 0.422998         |
-| smoker   | Categorical           | 0.783468         |
-| region   | Categorical           | 0.864832         |
-| charges  | Not-Generalizable     | 0.485356         |
 
 

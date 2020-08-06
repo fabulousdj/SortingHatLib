@@ -282,9 +282,11 @@ def FeaturizeFile(df):
 	return golden_data	
 
 
+# vectorizer,vectorizer1,vectorizer2 = CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer1.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer2.pkl", "rb")))
+vectorizerName = joblib.load("resources/dictionaryName.pkl")
+vectorizerSample = joblib.load("resources/dictionarySample.pkl")
 
-
-def ProcessStats(data):
+def FeatureExtraction(data):
 
     data1 = data[['total_vals', 'num_nans', '%_nans', 'num_of_dist_val', '%_dist_val', 'mean', 'std_dev', 'min_val', 'max_val','has_delimiters', 'has_url', 'has_email', 'has_date', 'mean_word_count',
        'std_dev_word_count', 'mean_stopword_total', 'stdev_stopword_total',
@@ -293,14 +295,6 @@ def ProcessStats(data):
        'is_list', 'is_long_sentence']]
     data1 = data1.reset_index(drop=True)
     data1 = data1.fillna(0)
-    
-    return data1
-
-# vectorizer,vectorizer1,vectorizer2 = CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer1.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer2.pkl", "rb")))
-vectorizerName = joblib.load("resources/dictionaryName.pkl")
-vectorizerSample = joblib.load("resources/dictionarySample.pkl")
-
-def FeatureExtraction(data,data1,flag):
 
     arr = data['Attribute_name'].values
     arr = [str(x) for x in arr]
@@ -312,15 +306,10 @@ def FeatureExtraction(data,data1,flag):
     arr3 = data['sample_3'].values
     arr3 = [str(x) for x in arr3]    
     print(len(arr1),len(arr2))
-    if flag:
-        X = vectorizerName.fit_transform(arr)
-        X1 = vectorizerSample.fit_transform(arr1)
-        X2 = vectorizerSample.transform(arr2)   
-        
-    else:
-        X = vectorizerName.transform(arr)
-        X1 = vectorizerSample.transform(arr1)
-        X2 = vectorizerSample.transform(arr2)        
+
+    X = vectorizerName.transform(arr)
+    X1 = vectorizerSample.transform(arr1)
+    X2 = vectorizerSample.transform(arr2)
 
     attr_df = pd.DataFrame(X.toarray())
     sample1_df = pd.DataFrame(X1.toarray())
