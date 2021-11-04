@@ -1,21 +1,10 @@
 import pickle
 import pandas as pd
-import numpy as np
-import os
 from pandas.api.types import is_numeric_dtype
-from collections import Counter,defaultdict
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn import metrics
 import re
 from nltk.corpus import stopwords 
 from nltk.tokenize import word_tokenize 
 import numpy as np
-from autogluon import TabularPrediction as task
-import copy
-import tensorflow_data_validation as tfdv
-# print(tfdv.version.__version__)
-from tensorflow_data_validation.utils.schema_util import get_feature,get_categorical_features,get_categorical_numeric_features,is_categorical_feature,get_multivalent_features
 import joblib
 
 rf_Filename = "resources/RandForest.pkl"
