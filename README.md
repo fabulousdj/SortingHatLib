@@ -2,12 +2,13 @@
 
 Library for ML feature type inference: https://github.com/pvn25/MLDataPrepZoo/tree/master/MLFeatureTypeInference
 
+Original repo: https://github.com/pvn25/SortingHatLib.git
 
 1. Install the package using python-pip
 
 ```bash
 
-git clone https://github.com/pvn25/SortingHatLib.git
+git clone https://github.com/fabulousdj/SortingHatLib.git
 
 pip install SortingHatLib/
 ```
