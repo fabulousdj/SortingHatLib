@@ -1,6 +1,6 @@
 # SortingHatLib
 
-Library for ML feature type inference: https://github.com/pvn25/MLDataPrepZoo/tree/master/MLFeatureTypeInference
+Library for ML feature type inference: https://github.com/pvn25/ML-Data-Prep-Zoo/tree/master/MLFeatureTypeInference
 
 Original repo: https://github.com/pvn25/SortingHatLib.git
 
