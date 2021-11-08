@@ -1,13 +1,20 @@
+import os
 import pickle
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
 import re
-from nltk.corpus import stopwords 
-from nltk.tokenize import word_tokenize 
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 import numpy as np
 import joblib
 
-rf_Filename = "resources/RandForest.pkl"
+# download nltk resources
+nltk.download('stopwords')
+nltk.download('punkt')
+
+this_dir, this_filename = os.path.split(__file__)  # Get path of data.pkl
+rf_Filename = os.path.join(this_dir, 'resources/RandForest.pkl')
 with open(rf_Filename, 'rb') as file:  Pickled_LR_Model = pickle.load(file)
 
 del_pattern = r'([^,;\|]+[,;\|]{1}[^,;\|]+){1,}'
@@ -39,14 +46,14 @@ def summary_stats(dat, key_s):
         max_val = 0
         if is_numeric_dtype(dat[col]):
             mean = np.mean(dat[col])
-            
+
             if pd.isnull(mean):
                 mean = 0
                 std_dev = 0
                 #var = 0
                 min_val = 0
-                max_val = 0           
-            else:    
+                max_val = 0
+            else:
                 std_dev = np.std(dat[col])
                 var = np.var(dat[col])
                 min_val = float(np.min(dat[col]))
@@ -73,7 +80,7 @@ def castability_feature(dat, column_names):
                 castability_list.append(0)
         else:
             castability_list.append(0)
-    return castability_list  
+    return castability_list
 
 
 def numeric_extraction(dat,column_names):
@@ -87,7 +94,7 @@ def numeric_extraction(dat,column_names):
             if i > len(dat[keys]) - 2:
                 break
         val = 0
-            
+
         if dat[keys][i].__class__.__name__ == 'str':
             #print('yes')
             #check whether any number can be extracted
@@ -98,9 +105,9 @@ def numeric_extraction(dat,column_names):
                 val = 1
             except:
                 pass
-            
+
         numeric_extraction_list.append(val)
-    
+
     return numeric_extraction_list
 
 def get_sample(dat, key_s):
@@ -114,13 +121,13 @@ def get_sample(dat, key_s):
     return rand
 
 def get_avg_tokens(samples):
-    
+
     # samples contain list of length len(keys) of 5-sample list.
     avg_tokens = []
     for sample_list in samples:
         list_of_num_tokens = [len(str(sample).split()) for sample in sample_list]
         avg_tokens.append(sum(list_of_num_tokens) / len(list_of_num_tokens))
-        
+
     return avg_tokens
 
 # summary_stat_result has a structure like [[Total_val, nans, dist_va, ...], ...].
@@ -184,10 +191,10 @@ def FeaturizeFile(df):
 	    val_append = []
 	    val_append.append(attribute_name[i])
 	    val_append.extend(stats[i])
-	    
+
 	    val_append.append(ratio_dist_val[i])
-	    val_append.append(ratio_nans[i])    
-	    
+	    val_append.append(ratio_nans[i])
+
 	    val_append.extend(sample[i])
 	#     val_append.append(castability[i])
 	#     val_append.append(number_extraction[i])
@@ -204,76 +211,76 @@ def FeaturizeFile(df):
 	    # print(row[11])
 	    is_list = False
 	    curlst = [row[11],row[12],row[13],row[14],row[15]]
-	    
+
 	    delim_cnt,url_cnt,email_cnt,date_cnt =0,0,0,0
 	    chars_totals,word_totals,stopwords,whitespaces,delims_count = [],[],[],[],[]
-	    
-	    for value in curlst: 
+
+	    for value in curlst:
 	        word_totals.append(len(str(value).split(' ')))
 	        chars_totals.append(len(str(value)))
 	        whitespaces.append(str(value).count(' '))
-	        
-	        if del_reg.match(str(value)):  delim_cnt += 1    
+
+	        if del_reg.match(str(value)):  delim_cnt += 1
 	        if url_reg.match(str(value)):  url_cnt += 1
 	        if email_reg.match(str(value)):  email_cnt += 1
-	        
-	        delims_count.append(len(delimeters.findall(str(value))))        
-	    
+
+	        delims_count.append(len(delimeters.findall(str(value))))
+
 	        tokenized = word_tokenize(str(value))
 	        # print(tokenized)
-	        stopwords.append(len([w for w in tokenized if w in stop_words]))    
-	    
+	        stopwords.append(len([w for w in tokenized if w in stop_words]))
+
 	        try:
 	            _ = pd.Timestamp(value)
 	            date_cnt += 1
-	        except ValueError: date_cnt += 0    
-	    
+	        except ValueError: date_cnt += 0
+
 	    # print(delim_cnt,url_cnt,email_cnt)
 	    if delim_cnt > 2:  curdf.at[row.Index, 'has_delimiters'] = True
 	    else: curdf.at[row.Index, 'has_delimiters'] = False
 
 	    if url_cnt > 2:  curdf.at[row.Index, 'has_url'] = True
 	    else: curdf.at[row.Index, 'has_url'] = False
-	        
+
 	    if email_cnt > 2:  curdf.at[row.Index, 'has_email'] = True
-	    else: curdf.at[row.Index, 'has_email'] = False   
-	        
+	    else: curdf.at[row.Index, 'has_email'] = False
+
 	    if date_cnt > 2:  curdf.at[row.Index, 'has_date'] = True
-	    else: curdf.at[row.Index, 'has_date'] = False           
-	        
+	    else: curdf.at[row.Index, 'has_date'] = False
+
 	    curdf.at[row.Index, 'mean_word_count'] = np.mean(word_totals)
 	    curdf.at[row.Index, 'std_dev_word_count'] = np.std(word_totals)
-	    
+
 	    curdf.at[row.Index, 'mean_stopword_total'] = np.mean(stopwords)
 	    curdf.at[row.Index, 'stdev_stopword_total'] = np.std(stopwords)
-	    
-	    curdf.at[row.Index, 'mean_char_count'] = np.mean(chars_totals)    
+
+	    curdf.at[row.Index, 'mean_char_count'] = np.mean(chars_totals)
 	    curdf.at[row.Index, 'stdev_char_count'] = np.std(chars_totals)
-	    
+
 	    curdf.at[row.Index, 'mean_whitespace_count'] = np.mean(whitespaces)
-	    curdf.at[row.Index, 'stdev_whitespace_count'] = np.std(whitespaces)    
-	    
+	    curdf.at[row.Index, 'stdev_whitespace_count'] = np.std(whitespaces)
+
 	    curdf.at[row.Index, 'mean_delim_count'] = np.mean(whitespaces)
-	    curdf.at[row.Index, 'stdev_delim_count'] = np.std(whitespaces)      
-	    
-	    if curdf.at[row.Index, 'has_delimiters'] and curdf.at[row.Index, 'mean_char_count'] < 100: curdf.at[row.Index, 'is_list'] = True    
+	    curdf.at[row.Index, 'stdev_delim_count'] = np.std(whitespaces)
+
+	    if curdf.at[row.Index, 'has_delimiters'] and curdf.at[row.Index, 'mean_char_count'] < 100: curdf.at[row.Index, 'is_list'] = True
 	    else: curdf.at[row.Index, 'is_list'] = False
-	    
-	    if curdf.at[row.Index, 'mean_word_count'] > 10: curdf.at[row.Index, 'is_long_sentence'] = True    
-	    else: curdf.at[row.Index, 'is_long_sentence'] = False    
-	    
+
+	    if curdf.at[row.Index, 'mean_word_count'] > 10: curdf.at[row.Index, 'is_long_sentence'] = True
+	    else: curdf.at[row.Index, 'is_long_sentence'] = False
+
 	    # print(np.mean(stopwords))
-	    
+
 	    # print('\n\n\n')
 
 	golden_data = curdf
 
-	return golden_data	
+	return golden_data
 
 
 # vectorizer,vectorizer1,vectorizer2 = CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer1.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer2.pkl", "rb")))
-vectorizerName = joblib.load("resources/dictionaryName.pkl")
-vectorizerSample = joblib.load("resources/dictionarySample.pkl")
+vectorizerName = joblib.load(os.path.join(this_dir, "resources/dictionaryName.pkl"))
+vectorizerSample = joblib.load(os.path.join(this_dir, "resources/dictionarySample.pkl"))
 
 def FeatureExtraction(data):
 
@@ -287,13 +294,13 @@ def FeatureExtraction(data):
 
     arr = data['Attribute_name'].values
     arr = [str(x) for x in arr]
-    
+
     arr1 = data['sample_1'].values
     arr1 = [str(x) for x in arr1]
     arr2 = data['sample_2'].values
     arr2 = [str(x) for x in arr2]
     arr3 = data['sample_3'].values
-    arr3 = [str(x) for x in arr3]    
+    arr3 = [str(x) for x in arr3]
     print(len(arr1),len(arr2))
 
     X = vectorizerName.transform(arr)
@@ -304,7 +311,7 @@ def FeatureExtraction(data):
     sample1_df = pd.DataFrame(X1.toarray())
     sample2_df = pd.DataFrame(X2.toarray())
     print(len(data1),len(attr_df),len(sample1_df),len(sample2_df))
-    
+
     data2 = pd.concat([data1, attr_df], axis=1, sort=False)
     print(len(data2))
     return data2
