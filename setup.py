@@ -11,4 +11,7 @@ setup(
     license='MIT',
     description='An example of a python package from pre-existing code',
     scripts=['scripts/hello.py'],
+    package_data={
+        'sortinghat' : ['resources/*.pkl']
+    }
 )
