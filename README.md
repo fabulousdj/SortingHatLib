@@ -2,6 +2,7 @@
 
 Library for ML feature type inference: https://github.com/pvn25/MLDataPrepZoo/tree/master/MLFeatureTypeInference
 
+Due to git-lfs limits, the resources files are moved to: https://drive.google.com/drive/folders/1eC8F5pO2hSoQf4RQM7zww49y2ZbLIvqG
 
 1. Install the package using python-pip
 
@@ -22,7 +23,6 @@ import sortinghat.pylib as pl
 
 
 ```bash
-# rf: Random Forest, neural: Neural Model, knn: K-nn, logreg: Logistic Regression, svm: RBF_SVM
 dataDownstream = pd.read_csv('adult.csv')
 
 ```
