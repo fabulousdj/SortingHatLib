@@ -24,7 +24,6 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import metrics
 import re
-from download_resources import download_resources
 from nltk.corpus import stopwords 
 from nltk.tokenize import word_tokenize 
 import numpy as np
