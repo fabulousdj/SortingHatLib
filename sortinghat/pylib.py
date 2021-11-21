@@ -16,12 +16,15 @@ import pickle
 import pandas as pd
 import numpy as np
 import os
+import zipfile
+import sys
 from pandas.api.types import is_numeric_dtype
 from collections import Counter,defaultdict
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn import metrics
 import re
+from download_resources import download_resources
 from nltk.corpus import stopwords 
 from nltk.tokenize import word_tokenize 
 import numpy as np
@@ -31,8 +34,24 @@ from keras.preprocessing import text as keras_text, sequence as keras_seq
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import accuracy_score, confusion_matrix
 from keras.models import load_model
+import zipfile
+import gdown
+import sortinghat
 
-rf_Filename = "resources/RandForest.pkl"
+def download_resources():    
+    resource_folder = os.path.dirname(sortinghat.__file__)
+    output_path = resource_folder+'/rsrcs.zip'
+    gdown.download(id='1NUPNJlcWBv2DMxKrdW9HE1m_9zjpsZMM',output=output_path,quiet=False)
+    with zipfile.ZipFile(output_path, 'r') as zip_ref:
+        zip_ref.extractall(resource_folder)
+    os.remove(output_path)
+    
+resource_folder= sortinghat.__path__[0]
+rf_Filename = resource_folder+"/resources/RandomForest.pkl"
+if 'resources' not in os.listdir(resource_folder):
+    print("Download resources..")
+    download_resources()
+
 with open(rf_Filename, 'rb') as file:  Pickled_LR_Model = pickle.load(file)
 
 del_pattern = r'([^,;\|]+[,;\|]{1}[^,;\|]+){1,}'
@@ -297,8 +316,8 @@ def FeaturizeFile(df):
 
 
 # vectorizer,vectorizer1,vectorizer2 = CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer1.pkl", "rb"))),CountVectorizer(decode_error="replace",vocabulary=pickle.load(open("vectorizer2.pkl", "rb")))
-vectorizerName = joblib.load("resources/Dictionary/dictionaryName.pkl")
-vectorizerSample = joblib.load("resources/Dictionary/dictionarySample.pkl")
+vectorizerName = joblib.load(resource_folder+"/resources/Dictionary/dictionaryName.pkl")
+vectorizerSample = joblib.load(resource_folder+"/resources/Dictionary/dictionarySample.pkl")
 
 def FeatureExtraction(data, useSamples=0):
 
@@ -397,13 +416,13 @@ def ProcessStats(data):
     return data1
 
 def Load_CNN(df):
-    CNNModel = load_model('resources/CNN.h5')
+    CNNModel = load_model(resource_folder+'/resources/CNN.h5')
     
     dataFeaturized = FeaturizeFile(df)
     structured_data_test = ProcessStats(dataFeaturized)    
     
-    with open('resources/Dictionary/keras_dictionaryName.pkl', 'rb') as handle: tokenizer = pickle.load(handle)
-    with open('resources/Dictionary/keras_dictionarySample.pkl', 'rb') as handle: tokenizer1 = pickle.load(handle)
+    with open(resource_folder+'/resources/Dictionary/keras_dictionaryName.pkl', 'rb') as handle: tokenizer = pickle.load(handle)
+    with open(resource_folder+'/resources/Dictionary/keras_dictionarySample.pkl', 'rb') as handle: tokenizer1 = pickle.load(handle)
 
     list_sentences_test = dataFeaturized['Attribute_name'].values
     list_sentences_test1 = dataFeaturized['sample_1'].values
