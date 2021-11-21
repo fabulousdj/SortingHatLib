@@ -40,7 +40,8 @@ import sortinghat
 def download_resources():    
     resource_folder = os.path.dirname(sortinghat.__file__)
     output_path = resource_folder+'/rsrcs.zip'
-    gdown.download(id='1NUPNJlcWBv2DMxKrdW9HE1m_9zjpsZMM',output=output_path,quiet=False)
+    URL = "https://drive.google.com/uc?id=1NUPNJlcWBv2DMxKrdW9HE1m_9zjpsZMM"
+    gdown.download(URL,output=output_path,quiet=False)
     with zipfile.ZipFile(output_path, 'r') as zip_ref:
         zip_ref.extractall(resource_folder)
     os.remove(output_path)
